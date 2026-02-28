@@ -816,6 +816,28 @@ def test_write_recordbatchreader(
     assert pa.table(table).to_pydict() == pa.table(sample_table).to_pydict()
 
 
+@pytest.mark.pyarrow
+def test_write_sequence_of_batches(
+    tmp_path: pathlib.Path,
+    sample_table: Table,
+):
+    """Test writing a list (Sequence) of RecordBatches to a Delta table.
+
+    Regression test for https://github.com/delta-io/delta-rs/issues/3961
+    """
+    import pyarrow as pa
+
+    batches = list(pa.table(sample_table).to_batches())
+    write_deltalake(tmp_path, batches, mode="overwrite")
+    table = (
+        QueryBuilder()
+        .register("tbl", DeltaTable(tmp_path))
+        .execute("select * from tbl")
+        .read_all()
+    )
+    assert pa.table(table).to_pydict() == pa.table(sample_table).to_pydict()
+
+
 def test_writer_partitioning(tmp_path: pathlib.Path):
     table = Table(
         {
