@@ -73,25 +73,43 @@ If you want to claim an issue to work on, you can write the word `take` as a com
     ```
 
 ## Run the docs locally
-*This serves your local contents of docs via a web browser, handy for checking what they look like if you are making changes to docs or docstings*
 
-```sh
-(cd python; make develop)
-pip install -r docs/requirements.txt
-mkdocs serve
-```
+Preview your doc and docstring changes in a web browser.
+
+- Install [Rust](https://doc.rust-lang.org/cargo/getting-started/installation.html).
+- Install the [uv Python package manager](https://docs.astral.sh/uv/getting-started/installation/).
+
+- Build the project for development. This will install `deltalake` into the Python virtual environment managed by uv.
+    ```sh
+    cd python
+    make develop
+    ```
+
+- From the root directory, activate the uv environment and install the Python docs requirements.
+    ```sh
+    cd ..
+    source python/.venv/bin/activate
+    pip install -r docs/requirements.txt
+    ```
+
+- Run `mkdocs serve` to preview your doc changes at http://127.0.0.1:8000/delta-io/delta-rs/.
 
 ## To make a pull request (PR)
 Make sure all the following steps run/pass locally before submitting a PR
 
 ```sh
-cargo fmt -- --check
 cd python
-make check-rust
-make check-python
+make check
 make develop
 make unit-test
 make build-docs
+```
+
+The `make check` command runs both `check-rust` (clippy + `cargo fmt`) and `check-python` (ruff + mypy).
+
+```{note}
+`cargo fmt` requires the `rustfmt` component. Install it with:
+`rustup component add rustfmt`
 ```
 
 ## Developing in VSCode
